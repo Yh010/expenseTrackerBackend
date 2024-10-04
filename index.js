@@ -1,4 +1,5 @@
-const {fetchPrice} = require("./services/fetchPrice")
+const { fetchPrice } = require("./services/fetchPrice")
+const { data } = require("./data");
 const express = require('express')
 const app = express()
 const port = 3000;
@@ -17,9 +18,10 @@ app.post('/data', async (req, res) => {
             return res.status(400).send("Missing stockQuote or exchange parameter");
         }
 
-        const data = await fetchPrice(stockQuote, exchange );
-        console.log(data);
-        res.json({ price: data });
+      //const data = await fetchPrice(stockQuote, exchange );
+      //const data = "yes you can fetch now";
+        console.log(data["summary"].price);
+        res.json({ price: data["summary"].price });
     } catch (error) {
         console.error("Error fetching price:", error);
         res.status(500).send("Error fetching price data");
