@@ -20,8 +20,24 @@ app.post('/data', async (req, res) => {
 
       //const data = await fetchPrice(stockQuote, exchange );
       //const data = "yes you can fetch now";
-        console.log(data["summary"].price);
-        res.json({ price: data["summary"].price });
+      console.log(data["summary"].price);
+
+
+      const filteredResults = data["news_results"].flatMap(result => 
+          result.items 
+          ? result.items
+              .filter(item => item.snippet && item.link && item.source && item.date) 
+              .map(item => ({ snippet: item.snippet, link: item.link, source: item.source, date: item.date })) 
+          : result.snippet && result.link && result.source && result.date 
+            ? [{ snippet: result.snippet, link: result.link, source: result.source, date: result.date }] 
+            : []
+          );
+
+      console.log(filteredResults)
+      res.json({
+        price: data["summary"].price,
+          news:filteredResults
+        });
     } catch (error) {
         console.error("Error fetching price:", error);
         res.status(500).send("Error fetching price data");
