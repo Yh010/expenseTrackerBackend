@@ -36,7 +36,8 @@ app.post('/data', async (req, res) => {
       console.log(filteredResults)
       res.json({
         price: data["summary"].price,
-          news:filteredResults
+        news: filteredResults,
+        graph: data["graph"]
         });
     } catch (error) {
         console.error("Error fetching price:", error);
