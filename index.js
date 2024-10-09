@@ -3,7 +3,8 @@ const { data } = require("./data");
 const express = require('express')
 const app = express()
 const port = 3000;
-var cors = require('cors')
+var cors = require('cors');
+const { generateUrl } = require("./services/Aws");
 app.use(express.json());
 app.use(cors())
 
@@ -44,6 +45,13 @@ app.post('/data', async (req, res) => {
         res.status(500).send("Error fetching price data");
     }
     
+})
+
+app.get('/filepath', async (req, res) => {
+    const {filename, path} = req.query;
+    const urls = await generateUrl(filename, path);
+
+    res.send({urls});
 })
 
 app.listen(port, () => {
