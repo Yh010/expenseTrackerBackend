@@ -1,5 +1,4 @@
 const { fetchPrice } = require("./services/fetchPrice")
-const { data } = require("./data");
 const express = require('express')
 const app = express()
 const port = 3000;
@@ -19,26 +18,15 @@ app.post('/data', async (req, res) => {
             return res.status(400).send("Missing stockQuote or exchange parameter");
         }
 
-      //const data = await fetchPrice(stockQuote, exchange );
-      //const data = "yes you can fetch now";
-      console.log(data["summary"].price);
-
-
-      const filteredResults = data["news_results"].flatMap(result => 
-          result.items 
-          ? result.items
-              .filter(item => item.snippet && item.link && item.source && item.date) 
-              .map(item => ({ snippet: item.snippet, link: item.link, source: item.source, date: item.date })) 
-          : result.snippet && result.link && result.source && result.date 
-            ? [{ snippet: result.snippet, link: result.link, source: result.source, date: result.date }] 
-            : []
-          );
+    const data = await fetchPrice(stockQuote, exchange);
+        
+      const filteredResults = processNewsResults(data.news_results);
 
       console.log(filteredResults)
-      res.json({
-        price: data["summary"].price,
-        news: filteredResults,
-        graph: data["graph"]
+       res.json({
+            price: data.summary?.price || "N/A",
+            news: filteredResults,
+            graph: data.graph || []
         });
     } catch (error) {
         console.error("Error fetching price:", error);
@@ -57,3 +45,25 @@ app.get('/filepath', async (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+function processNewsResults(newsResults) {
+    return newsResults.flatMap(result => 
+        result.items 
+            ? result.items
+                .filter(item => item.snippet && item.link && item.source && item.date)
+                .map(item => ({
+                    snippet: item.snippet,
+                    link: item.link,
+                    source: item.source,
+                    date: item.date
+                }))
+            : result.snippet && result.link && result.source && result.date
+                ? [{
+                    snippet: result.snippet,
+                    link: result.link,
+                    source: result.source,
+                    date: result.date
+                }]
+                : []
+    );
+}
