@@ -1,7 +1,8 @@
 const { fetchPrice } = require("./services/fetchPrice")
+require('dotenv').config({ path: '.env.local' })
 const express = require('express')
 const app = express()
-const port = 3000;
+const port = process.env.PORT || 3000;
 var cors = require('cors');
 const { generateUrl } = require("./services/Aws");
 app.use(express.json());
